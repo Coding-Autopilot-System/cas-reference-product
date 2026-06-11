@@ -1,0 +1,20 @@
+defaultEnvironment: dev
+environments:
+  dev:
+    projectEndpoint: https://replace-me.services.ai.azure.com/api/projects/replace-me
+    agentName: cas-reference-agent-dev
+    azureContainerRegistry: replace-me.azurecr.io
+    evaluationSuites:
+      - id: smoke-core
+        tags:
+          tier: smoke
+          purpose: baseline
+          stage: seed
+        dataset: cas-reference-agent-dev-seed
+        datasetVersion: v1
+        datasetFile: .foundry/datasets/cas-reference-agent-dev-seed-v1.jsonl
+        datasetUri: replace-with-foundry-dataset-uri
+        evaluators:
+          - name: task_adherence
+            threshold: 4
+

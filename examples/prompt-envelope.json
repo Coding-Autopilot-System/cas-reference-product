@@ -1,0 +1,17 @@
+{
+  "kind": "PromptEnvelope",
+  "correlationId": "corr-reference-001",
+  "promptId": "prompt-reference-001",
+  "runId": "run-reference-001",
+  "repo": "Coding-Autopilot-System/cas-reference-product",
+  "actor": { "id": "local-developer", "type": "human" },
+  "timestamp": "2026-06-11T09:00:00Z",
+  "schemaVersion": "0.1.0",
+  "traceContext": {
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+  },
+  "intent": "Explain the reference workflow",
+  "prompt": "Explain how the CAS reference workflow works.",
+  "constraints": ["Do not expose secrets"]
+}
+

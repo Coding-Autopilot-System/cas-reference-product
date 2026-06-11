@@ -1,0 +1,30 @@
+apiVersion: cas.coding-autopilot.dev/v0.1
+kind: ContainerWorkload
+metadata:
+  name: cas-reference-product
+spec:
+  image:
+    required: true
+    platform: linux/amd64
+  ingress:
+    targetPort: 8080
+    externalByDefault: false
+    allowInsecure: false
+  identity:
+    type: SystemAssigned
+  probes:
+    liveness: /health/live
+    readiness: /health/ready
+  environment:
+    nonSecret:
+      - ENVIRONMENT
+      - WORKFLOW_BACKEND
+      - FOUNDRY_PROJECT_ENDPOINT
+      - FOUNDRY_AGENT_NAME
+    deploymentInjected:
+      - APPLICATIONINSIGHTS_CONNECTION_STRING
+  outputsConsumed:
+    - workloadPrincipalId
+    - applicationInsightsId
+    - logAnalyticsWorkspaceId
+
