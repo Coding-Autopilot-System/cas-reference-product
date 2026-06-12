@@ -1,6 +1,7 @@
 from opentelemetry import trace
 
 from .config import Settings
+from .identity import build_credential
 
 
 def configure_telemetry(settings: Settings) -> None:
@@ -9,6 +10,14 @@ def configure_telemetry(settings: Settings) -> None:
 
         configure_azure_monitor(
             connection_string=settings.applicationinsights_connection_string,
+            credential=build_credential(settings.environment),
+            disable_offline_storage=True,
+            instrumentation_options={
+                "azure_sdk": {"enabled": False},
+                "requests": {"enabled": False},
+                "urllib": {"enabled": False},
+                "urllib3": {"enabled": False},
+            },
             service_name=settings.app_name,
         )
 

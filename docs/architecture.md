@@ -30,4 +30,5 @@ The Foundry call is isolated behind the `WorkflowAgentService` protocol. This ke
 - `cas.workflow.execute` covers core orchestration.
 - `foundry.responses.create` covers the external Foundry call.
 - CAS correlation IDs are attached to workflow spans and canonical events preserve W3C trace context.
-
+- Broad Azure SDK and outbound HTTP auto-instrumentation is disabled to avoid capturing prompt or
+  output content. The application records only explicit boundary spans and safe identifiers.
