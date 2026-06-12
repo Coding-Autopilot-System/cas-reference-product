@@ -13,9 +13,8 @@ def configure_telemetry(settings: Settings) -> None:
         )
 
 
-def current_traceparent() -> str:
+def current_traceparent(fallback: str) -> str:
     context = trace.get_current_span().get_span_context()
     if context.is_valid:
         return f"00-{context.trace_id:032x}-{context.span_id:016x}-01"
-    return "00-00000000000000000000000000000001-0000000000000001-00"
-
+    return fallback
