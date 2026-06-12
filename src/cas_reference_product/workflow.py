@@ -36,8 +36,10 @@ class FoundryWorkflowAgentService:
     """Invoke a Foundry Next Gen agent reference through the project Responses client."""
 
     def __init__(self, settings: Settings) -> None:
-        if not settings.foundry_project_endpoint or not settings.foundry_agent_name:
-            raise ValueError("Foundry backend requires project endpoint and agent name")
+        if not settings.foundry_ready:
+            raise ValueError("Foundry backend requires a valid project endpoint and agent name")
+        assert settings.foundry_project_endpoint is not None
+        assert settings.foundry_agent_name is not None
         self._agent_name = settings.foundry_agent_name
         self._client = AIProjectClient(
             endpoint=settings.foundry_project_endpoint,

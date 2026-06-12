@@ -27,6 +27,18 @@ def test_factory_builds_foundry_service_when_configured() -> None:
     service.assert_called_once_with(settings)
 
 
+def test_foundry_service_rejects_invalid_project_endpoint() -> None:
+    settings = Settings(
+        environment="prod",
+        workflow_backend="foundry",
+        foundry_project_endpoint="https://example.invalid/project",
+        foundry_agent_name="cas-reference-agent",
+    )
+
+    with pytest.raises(ValueError, match="valid project endpoint"):
+        FoundryWorkflowAgentService(settings)
+
+
 def test_foundry_service_uses_next_gen_agent_reference(envelope) -> None:
     settings = Settings(
         environment="prod",
