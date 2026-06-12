@@ -44,7 +44,12 @@ class FoundryWorkflowAgentService:
         with tracer.start_as_current_span("foundry.responses.create"):
             response = self._client.responses.create(
                 input=envelope.prompt,
-                extra_body={"agent": {"name": self._agent_name, "type": "agent_reference"}},
+                extra_body={
+                    "agent_reference": {
+                        "name": self._agent_name,
+                        "type": "agent_reference",
+                    }
+                },
             )
         return response.output_text
 

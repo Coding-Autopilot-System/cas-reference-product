@@ -46,6 +46,11 @@ def test_foundry_service_uses_next_gen_agent_reference(envelope) -> None:
     )
     responses.create.assert_called_once_with(
         input=envelope.prompt,
-        extra_body={"agent": {"name": "cas-reference-agent", "type": "agent_reference"}},
+        extra_body={
+            "agent_reference": {
+                "name": "cas-reference-agent",
+                "type": "agent_reference",
+            }
+        },
     )
     assert result == "Foundry result"
