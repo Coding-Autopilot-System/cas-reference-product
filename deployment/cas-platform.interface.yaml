@@ -23,8 +23,3 @@ spec:
       - FOUNDRY_AGENT_NAME
     deploymentInjected:
       - APPLICATIONINSIGHTS_CONNECTION_STRING
-  outputsConsumed:
-    - workloadPrincipalId
-    - applicationInsightsId
-    - logAnalyticsWorkspaceId
-

@@ -22,7 +22,12 @@ The Foundry call is isolated behind the `WorkflowAgentService` protocol. This ke
 
 ## Deployment Interface
 
-`deployment/cas-platform.interface.yaml` records the contract: Linux AMD64 image, port 8080, internal ingress by default, system-assigned identity, probes, non-secret identifiers, and platform outputs. It does not deploy resources.
+`deployment/cas-platform.interface.yaml` records the application contract: Linux AMD64 image, port
+8080, internal ingress by default, system-assigned identity, probes, and configuration inputs. It does
+not deploy resources.
+
+The application consumes only the environment values listed in that interface. Platform resource IDs
+and principal IDs remain deployment-orchestration outputs and are not application configuration.
 
 ## Observability Boundaries
 
