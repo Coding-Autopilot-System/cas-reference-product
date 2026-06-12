@@ -20,6 +20,10 @@ class WorkflowAgentService(Protocol):
     def run(self, envelope: PromptEnvelope) -> str: ...
 
 
+class WorkflowAgentServiceError(RuntimeError):
+    """Stable application error raised when an external workflow backend fails."""
+
+
 class LocalWorkflowAgentService:
     def run(self, envelope: PromptEnvelope) -> str:
         return (
@@ -42,15 +46,18 @@ class FoundryWorkflowAgentService:
 
     def run(self, envelope: PromptEnvelope) -> str:
         with tracer.start_as_current_span("foundry.responses.create"):
-            response = self._client.responses.create(
-                input=envelope.prompt,
-                extra_body={
-                    "agent_reference": {
-                        "name": self._agent_name,
-                        "type": "agent_reference",
-                    }
-                },
-            )
+            try:
+                response = self._client.responses.create(
+                    input=envelope.prompt,
+                    extra_body={
+                        "agent_reference": {
+                            "name": self._agent_name,
+                            "type": "agent_reference",
+                        }
+                    },
+                )
+            except Exception:
+                raise WorkflowAgentServiceError("Foundry workflow invocation failed") from None
         return response.output_text
 
 

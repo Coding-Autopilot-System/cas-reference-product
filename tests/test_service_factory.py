@@ -1,9 +1,12 @@
 from unittest.mock import patch
 
+import pytest
+
 from cas_reference_product.config import Settings
 from cas_reference_product.workflow import (
     FoundryWorkflowAgentService,
     LocalWorkflowAgentService,
+    WorkflowAgentServiceError,
     build_workflow_agent_service,
 )
 
@@ -54,3 +57,23 @@ def test_foundry_service_uses_next_gen_agent_reference(envelope) -> None:
         },
     )
     assert result == "Foundry result"
+
+
+def test_foundry_service_sanitizes_sdk_failure(envelope) -> None:
+    settings = Settings(
+        environment="prod",
+        workflow_backend="foundry",
+        foundry_project_endpoint="https://example.services.ai.azure.com/api/projects/example",
+        foundry_agent_name="cas-reference-agent",
+    )
+    with (
+        patch("cas_reference_product.workflow.build_credential"),
+        patch("cas_reference_product.workflow.AIProjectClient") as project_client,
+    ):
+        project_client.return_value.get_openai_client.return_value.responses.create.side_effect = (
+            RuntimeError("sensitive provider detail")
+        )
+        service = FoundryWorkflowAgentService(settings)
+
+        with pytest.raises(WorkflowAgentServiceError, match="Foundry workflow invocation failed"):
+            service.run(envelope)
