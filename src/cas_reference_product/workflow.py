@@ -104,6 +104,9 @@ class WorkflowOrchestrator:
         status: RunStatus,
         message: str,
     ) -> RunEvent:
+        trace_context = {"traceparent": current_traceparent(envelope.traceContext.traceparent)}
+        if envelope.traceContext.tracestate is not None:
+            trace_context["tracestate"] = envelope.traceContext.tracestate
         return RunEvent(
             correlationId=envelope.correlationId,
             promptId=envelope.promptId,
@@ -111,10 +114,7 @@ class WorkflowOrchestrator:
             repo=self._repository,
             actor=Actor(id="cas-reference-workflow", type="workflow"),
             timestamp=self._clock(),
-            traceContext=TraceContext(
-                traceparent=current_traceparent(envelope.traceContext.traceparent),
-                tracestate=envelope.traceContext.tracestate,
-            ),
+            traceContext=TraceContext.model_validate(trace_context),
             eventType=event_type,
             sequence=sequence,
             status=status,

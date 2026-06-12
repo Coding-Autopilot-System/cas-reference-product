@@ -1,0 +1,44 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "https://schemas.coding-autopilot.dev/v0.1/prompt-envelope.schema.json",
+    "title":  "PromptEnvelope",
+    "type":  "object",
+    "allOf":  [
+                  {
+                      "$ref":  "common.schema.json#/$defs/lifecycleMetadata"
+                  },
+                  {
+                      "type":  "object",
+                      "required":  [
+                                       "kind",
+                                       "intent",
+                                       "prompt"
+                                   ],
+                      "properties":  {
+                                         "kind":  {
+                                                      "const":  "PromptEnvelope"
+                                                  },
+                                         "intent":  {
+                                                        "type":  "string",
+                                                        "minLength":  1,
+                                                        "maxLength":  256
+                                                    },
+                                         "prompt":  {
+                                                        "type":  "string",
+                                                        "minLength":  1,
+                                                        "maxLength":  50000
+                                                    },
+                                         "constraints":  {
+                                                             "type":  "array",
+                                                             "items":  {
+                                                                           "type":  "string",
+                                                                           "minLength":  1,
+                                                                           "maxLength":  1000
+                                                                       },
+                                                             "uniqueItems":  true
+                                                         }
+                                     }
+                  }
+              ],
+    "unevaluatedProperties":  false
+}

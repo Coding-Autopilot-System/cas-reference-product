@@ -1,0 +1,48 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "https://schemas.coding-autopilot.dev/v0.1/run-event.schema.json",
+    "title":  "RunEvent",
+    "type":  "object",
+    "allOf":  [
+                  {
+                      "$ref":  "common.schema.json#/$defs/lifecycleMetadata"
+                  },
+                  {
+                      "type":  "object",
+                      "required":  [
+                                       "kind",
+                                       "eventType",
+                                       "sequence",
+                                       "status"
+                                   ],
+                      "properties":  {
+                                         "kind":  {
+                                                      "const":  "RunEvent"
+                                                  },
+                                         "eventType":  {
+                                                           "type":  "string",
+                                                           "minLength":  1,
+                                                           "maxLength":  128
+                                                       },
+                                         "sequence":  {
+                                                          "type":  "integer",
+                                                          "minimum":  0
+                                                      },
+                                         "status":  {
+                                                        "enum":  [
+                                                                     "queued",
+                                                                     "running",
+                                                                     "succeeded",
+                                                                     "failed",
+                                                                     "cancelled"
+                                                                 ]
+                                                    },
+                                         "message":  {
+                                                         "type":  "string",
+                                                         "maxLength":  5000
+                                                     }
+                                     }
+                  }
+              ],
+    "unevaluatedProperties":  false
+}

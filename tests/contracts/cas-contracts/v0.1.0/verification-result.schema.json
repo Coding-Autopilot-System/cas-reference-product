@@ -1,0 +1,62 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "https://schemas.coding-autopilot.dev/v0.1/verification-result.schema.json",
+    "title":  "VerificationResult",
+    "type":  "object",
+    "allOf":  [
+                  {
+                      "$ref":  "common.schema.json#/$defs/lifecycleMetadata"
+                  },
+                  {
+                      "type":  "object",
+                      "required":  [
+                                       "kind",
+                                       "outcome",
+                                       "checks"
+                                   ],
+                      "properties":  {
+                                         "kind":  {
+                                                      "const":  "VerificationResult"
+                                                  },
+                                         "outcome":  {
+                                                         "enum":  [
+                                                                      "passed",
+                                                                      "failed",
+                                                                      "inconclusive"
+                                                                  ]
+                                                     },
+                                         "checks":  {
+                                                        "type":  "array",
+                                                        "minItems":  1,
+                                                        "items":  {
+                                                                      "type":  "object",
+                                                                      "additionalProperties":  false,
+                                                                      "required":  [
+                                                                                       "name",
+                                                                                       "outcome"
+                                                                                   ],
+                                                                      "properties":  {
+                                                                                         "name":  {
+                                                                                                      "type":  "string",
+                                                                                                      "minLength":  1,
+                                                                                                      "maxLength":  256
+                                                                                                  },
+                                                                                         "outcome":  {
+                                                                                                         "enum":  [
+                                                                                                                      "passed",
+                                                                                                                      "failed",
+                                                                                                                      "skipped"
+                                                                                                                  ]
+                                                                                                     },
+                                                                                         "evidenceUri":  {
+                                                                                                             "type":  "string",
+                                                                                                             "format":  "uri"
+                                                                                                         }
+                                                                                     }
+                                                                  }
+                                                    }
+                                     }
+                  }
+              ],
+    "unevaluatedProperties":  false
+}
