@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class Actor(BaseModel):
@@ -33,7 +33,16 @@ class PromptEnvelope(LifecycleMetadata):
     kind: Literal["PromptEnvelope"] = "PromptEnvelope"
     intent: str = Field(min_length=1, max_length=256)
     prompt: str = Field(min_length=1, max_length=50_000)
-    constraints: list[str] = Field(default_factory=list)
+    constraints: list[Annotated[str, Field(min_length=1, max_length=1_000)]] = Field(
+        default_factory=list
+    )
+
+    @field_validator("constraints")
+    @classmethod
+    def constraints_must_be_unique(cls, constraints: list[str]) -> list[str]:
+        if len(constraints) != len(set(constraints)):
+            raise ValueError("constraints must contain unique values")
+        return constraints
 
 
 class RunEvent(LifecycleMetadata):
@@ -49,4 +58,3 @@ class WorkflowResult(BaseModel):
     runId: str
     output: str
     events: list[RunEvent]
-
