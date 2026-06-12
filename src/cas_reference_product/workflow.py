@@ -20,6 +20,10 @@ class WorkflowAgentService(Protocol):
     def run(self, envelope: PromptEnvelope) -> str: ...
 
 
+class WorkflowAgentServiceError(RuntimeError):
+    """Stable application error raised when an external workflow backend fails."""
+
+
 class LocalWorkflowAgentService:
     def run(self, envelope: PromptEnvelope) -> str:
         return (
@@ -32,20 +36,30 @@ class FoundryWorkflowAgentService:
     """Invoke a Foundry Next Gen agent reference through the project Responses client."""
 
     def __init__(self, settings: Settings) -> None:
-        if not settings.foundry_project_endpoint or not settings.foundry_agent_name:
-            raise ValueError("Foundry backend requires project endpoint and agent name")
-        self._agent_name = settings.foundry_agent_name
+        endpoint = settings.foundry_project_endpoint
+        agent_name = settings.foundry_agent_name
+        if not settings.foundry_ready or endpoint is None or agent_name is None:
+            raise ValueError("Foundry backend requires a valid project endpoint and agent name")
+        self._agent_name = agent_name
         self._client = AIProjectClient(
-            endpoint=settings.foundry_project_endpoint,
+            endpoint=endpoint,
             credential=build_credential(settings.environment),
         ).get_openai_client()
 
     def run(self, envelope: PromptEnvelope) -> str:
         with tracer.start_as_current_span("foundry.responses.create"):
-            response = self._client.responses.create(
-                input=envelope.prompt,
-                extra_body={"agent": {"name": self._agent_name, "type": "agent_reference"}},
-            )
+            try:
+                response = self._client.responses.create(
+                    input=envelope.prompt,
+                    extra_body={
+                        "agent_reference": {
+                            "name": self._agent_name,
+                            "type": "agent_reference",
+                        }
+                    },
+                )
+            except Exception:
+                raise WorkflowAgentServiceError("Foundry workflow invocation failed") from None
         return response.output_text
 
 
@@ -92,6 +106,9 @@ class WorkflowOrchestrator:
         status: RunStatus,
         message: str,
     ) -> RunEvent:
+        trace_context = {"traceparent": current_traceparent(envelope.traceContext.traceparent)}
+        if envelope.traceContext.tracestate is not None:
+            trace_context["tracestate"] = envelope.traceContext.tracestate
         return RunEvent(
             correlationId=envelope.correlationId,
             promptId=envelope.promptId,
@@ -99,7 +116,7 @@ class WorkflowOrchestrator:
             repo=self._repository,
             actor=Actor(id="cas-reference-workflow", type="workflow"),
             timestamp=self._clock(),
-            traceContext=TraceContext(traceparent=current_traceparent()),
+            traceContext=TraceContext.model_validate(trace_context),
             eventType=event_type,
             sequence=sequence,
             status=status,

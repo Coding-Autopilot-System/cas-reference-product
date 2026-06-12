@@ -27,9 +27,9 @@ def test_orchestrator_returns_traceable_events(envelope) -> None:
         "workflow.completed",
     ]
     assert all(event.timestamp == fixed for event in result.events)
+    assert all(event.traceContext == envelope.traceContext for event in result.events)
 
 
 def test_orchestrator_propagates_failure(envelope) -> None:
     with pytest.raises(RuntimeError, match="expected"):
         WorkflowOrchestrator(FailingService(), envelope.repo).execute(envelope)
-

@@ -1,0 +1,54 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "https://schemas.coding-autopilot.dev/v0.1/work-request.schema.json",
+    "title":  "WorkRequest",
+    "type":  "object",
+    "allOf":  [
+                  {
+                      "$ref":  "common.schema.json#/$defs/lifecycleMetadata"
+                  },
+                  {
+                      "type":  "object",
+                      "required":  [
+                                       "kind",
+                                       "workType",
+                                       "objective",
+                                       "targetRef",
+                                       "riskLevel"
+                                   ],
+                      "properties":  {
+                                         "kind":  {
+                                                      "const":  "WorkRequest"
+                                                  },
+                                         "workType":  {
+                                                          "enum":  [
+                                                                       "analyze",
+                                                                       "change",
+                                                                       "verify",
+                                                                       "repair",
+                                                                       "deploy"
+                                                                   ]
+                                                      },
+                                         "objective":  {
+                                                           "type":  "string",
+                                                           "minLength":  1,
+                                                           "maxLength":  5000
+                                                       },
+                                         "targetRef":  {
+                                                           "type":  "string",
+                                                           "minLength":  1,
+                                                           "maxLength":  256
+                                                       },
+                                         "riskLevel":  {
+                                                           "enum":  [
+                                                                        "low",
+                                                                        "medium",
+                                                                        "high",
+                                                                        "critical"
+                                                                    ]
+                                                       }
+                                     }
+                  }
+              ],
+    "unevaluatedProperties":  false
+}

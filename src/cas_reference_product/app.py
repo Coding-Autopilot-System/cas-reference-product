@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Request
 from .config import Settings, get_settings
 from .models import PromptEnvelope, WorkflowResult
 from .telemetry import configure_telemetry
-from .workflow import WorkflowOrchestrator, build_workflow_agent_service
+from .workflow import WorkflowAgentServiceError, WorkflowOrchestrator, build_workflow_agent_service
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -37,7 +37,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=503, detail="Workflow backend is not ready")
         request.state.correlation_id = envelope.correlationId
         orchestrator = WorkflowOrchestrator(service, app_settings.repository)
-        return orchestrator.execute(envelope)
+        try:
+            return orchestrator.execute(envelope)
+        except WorkflowAgentServiceError:
+            raise HTTPException(status_code=502, detail="Workflow backend request failed") from None
 
     @app.get("/")
     def root() -> dict[str, Any]:

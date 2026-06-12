@@ -1,0 +1,45 @@
+{
+  "version": "0.1.0",
+  "schemas": [
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/artifact-manifest.schema.json",
+      "path": "artifact-manifest.schema.json",
+      "sha256": "6c2192fb6ca79843361695f3dccd5ebf1dda8ce320c974db2630b0a2b78705bd"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/common.schema.json",
+      "path": "common.schema.json",
+      "sha256": "c7ce72a6f5da8394e48f2421820588a8142546962e05152997bd1e6ced994928"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/evaluation-result.schema.json",
+      "path": "evaluation-result.schema.json",
+      "sha256": "12e8019f858dc0cda80ac8994ca1251a9a229a8642b05706227bd9c995c5799a"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/policy-decision.schema.json",
+      "path": "policy-decision.schema.json",
+      "sha256": "9cf259d405664560b30b7afd25d08d888337fd9a81a6a388ceeb36cbf7edcc33"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/prompt-envelope.schema.json",
+      "path": "prompt-envelope.schema.json",
+      "sha256": "58a991862031f40c2ffcc073743776d05206684534fac2c20c67c274fbf05c84"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/run-event.schema.json",
+      "path": "run-event.schema.json",
+      "sha256": "1bcaee2ff546439ea81d64d57dcb51cd9f57dd790fe300fd90e251823e27a36f"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/verification-result.schema.json",
+      "path": "verification-result.schema.json",
+      "sha256": "aeff3d41eeb99b3017b460c2a2a8d07b4e1c828830b72853d5f41d93d6abe012"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/work-request.schema.json",
+      "path": "work-request.schema.json",
+      "sha256": "543e1dd2313cff2a1ebeb1470db3085b89c3933694231eb5b4798096f147e4a7"
+    }
+  ]
+}

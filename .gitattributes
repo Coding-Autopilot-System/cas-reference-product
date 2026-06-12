@@ -10,3 +10,4 @@ Dockerfile text eol=lf
 *.md text eol=lf
 *.toml text eol=lf
 *.ps1 text eol=crlf
+tests/contracts/cas-contracts/v0.1.0/*.json -text -diff

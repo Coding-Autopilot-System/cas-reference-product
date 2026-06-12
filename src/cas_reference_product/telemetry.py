@@ -1,6 +1,7 @@
 from opentelemetry import trace
 
 from .config import Settings
+from .identity import build_credential
 
 
 def configure_telemetry(settings: Settings) -> None:
@@ -9,13 +10,20 @@ def configure_telemetry(settings: Settings) -> None:
 
         configure_azure_monitor(
             connection_string=settings.applicationinsights_connection_string,
+            credential=build_credential(settings.environment),
+            disable_offline_storage=True,
+            instrumentation_options={
+                "azure_sdk": {"enabled": False},
+                "requests": {"enabled": False},
+                "urllib": {"enabled": False},
+                "urllib3": {"enabled": False},
+            },
             service_name=settings.app_name,
         )
 
 
-def current_traceparent() -> str:
+def current_traceparent(fallback: str) -> str:
     context = trace.get_current_span().get_span_context()
     if context.is_valid:
         return f"00-{context.trace_id:032x}-{context.span_id:016x}-01"
-    return "00-00000000000000000000000000000001-0000000000000001-00"
-
+    return fallback
