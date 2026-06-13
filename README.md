@@ -63,9 +63,9 @@ The image runs as a non-root user, listens on port `8080`, and provides `/health
 - [Architecture](docs/architecture.md)
 - [Threat model](docs/threat-model.md)
 - [Operations](docs/operations.md)
+- [Immutable golden-path case-study evidence](docs/case-study-evidence.md)
 - [cas-platform interface](deployment/cas-platform.interface.yaml)
 
 ## Security
 
 Report vulnerabilities through GitHub private vulnerability reporting. Do not include credentials or sensitive prompt data in issues.
-

@@ -1,0 +1,24 @@
+{
+  "repositories": [
+    {
+      "repository": "Coding-Autopilot-System/cas-reference-product",
+      "sha": "f09c271a4e6519693d7cee8f6120bf833ffb987f",
+      "uri": "https://github.com/Coding-Autopilot-System/cas-reference-product/tree/f09c271a4e6519693d7cee8f6120bf833ffb987f"
+    },
+    {
+      "repository": "Coding-Autopilot-System/cas-contracts",
+      "sha": "7f924bfc95dce785442b6b8c02904a8e92fbb63a",
+      "uri": "https://github.com/Coding-Autopilot-System/cas-contracts/tree/7f924bfc95dce785442b6b8c02904a8e92fbb63a"
+    },
+    {
+      "repository": "Coding-Autopilot-System/cas-evals",
+      "sha": "0e14f98384c561c81bea5ef1fb7dc1f7c1b4c105",
+      "uri": "https://github.com/Coding-Autopilot-System/cas-evals/tree/0e14f98384c561c81bea5ef1fb7dc1f7c1b4c105"
+    },
+    {
+      "repository": "Coding-Autopilot-System/cas-platform",
+      "sha": "131135297a6c6fb4544becaa9f1d229615960d8d",
+      "uri": "https://github.com/Coding-Autopilot-System/cas-platform/tree/131135297a6c6fb4544becaa9f1d229615960d8d"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "suiteId": "cas-reference-product-golden-v0.1",
+  "releasedAt": "2026-06-12T00:00:00Z",
+  "cases": [
+    {
+      "id": "reference-product-golden-workflow",
+      "kind": "golden",
+      "capability": "golden-path",
+      "prompt": "Execute the deterministic reference workflow.",
+      "response": "Reference workflow accepted 'golden-path' with 0 constraints.",
+      "expected": {
+        "keywords": ["reference workflow accepted", "golden-path", "0 constraints"],
+        "prohibited": ["failed", "secret"]
+      },
+      "limits": {
+        "min_quality": 1.0,
+        "max_cost_usd": 0.01,
+        "max_latency_ms": 1000
+      },
+      "observed": {
+        "cost_usd": 0.0,
+        "latency_ms": 100
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "kind": "ArtifactManifest",
+  "correlationId": "cas-reference-product-golden-v0.1",
+  "promptId": "reference-product-golden-workflow",
+  "runId": "cas-reference-product-golden-v0.1",
+  "repo": "Coding-Autopilot-System/cas-reference-product",
+  "actor": {
+    "id": "evidence-bundle-ci",
+    "type": "workflow"
+  },
+  "timestamp": "2026-06-13T00:00:00Z",
+  "schemaVersion": "0.1.0",
+  "traceContext": {
+    "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+  },
+  "artifacts": [
+    {
+      "kind": "source-provenance",
+      "uri": "urn:cas-evidence:verified-local-golden-path-v0.1:source-provenance",
+      "sha256": "d621003fea89b9e0a6af8ce87c1e6f60e42ad9a6df5f775a778dcccbafc6aa18"
+    },
+    {
+      "kind": "contract-registry-manifest",
+      "uri": "urn:cas-evidence:verified-local-golden-path-v0.1:contract-registry-manifest",
+      "sha256": "92a09b0907e08b022f96b89ce09764b0416d268acc38653e08fd335b5e5198f9"
+    },
+    {
+      "kind": "evaluation-result",
+      "uri": "urn:cas-evidence:verified-local-golden-path-v0.1:eval-evidence",
+      "sha256": "6d95d47fbdf422ff8fc3608b53b283e99b3f74b135d3876c7a1a4557dde2a8e7"
+    },
+    {
+      "kind": "evaluation-fixture",
+      "uri": "urn:cas-evidence:verified-local-golden-path-v0.1:golden-fixture",
+      "sha256": "667fc47e19c3910dcc202063d8167f1acf6417e4cb35b705f8862a2886c5188a"
+    },
+    {
+      "kind": "platform-what-if-reference",
+      "uri": "urn:cas-evidence:verified-local-golden-path-v0.1:platform-what-if-reference",
+      "sha256": "d6c57d4fb80aa168025368134ff8022f3a8328a92936503518e460aef03907ad"
+    }
+  ]
+}

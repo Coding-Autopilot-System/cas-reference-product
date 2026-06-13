@@ -1,0 +1,126 @@
+{
+  "evidence": [
+    {
+      "caseId": "reference-product-golden-workflow",
+      "execution": {
+        "adapter": "cas-reference-product",
+        "events": [
+          {
+            "correlationId": "eval-reference-product-golden-workflow",
+            "eventType": "workflow.started",
+            "promptId": "reference-product-golden-workflow",
+            "runId": "cas-reference-product-golden-v0.1",
+            "sequence": 0,
+            "status": "running",
+            "traceContext": {
+              "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+            }
+          },
+          {
+            "correlationId": "eval-reference-product-golden-workflow",
+            "eventType": "workflow.completed",
+            "promptId": "reference-product-golden-workflow",
+            "runId": "cas-reference-product-golden-v0.1",
+            "sequence": 1,
+            "status": "succeeded",
+            "traceContext": {
+              "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+            }
+          }
+        ],
+        "lifecycle": {
+          "correlationId": "eval-reference-product-golden-workflow",
+          "promptId": "reference-product-golden-workflow",
+          "runId": "cas-reference-product-golden-v0.1",
+          "traceContext": {
+            "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+          }
+        },
+        "responseDigest": "sha256:41290a8442527585b7deaf674f029c88642225e84ac7f4392d3dec3c52d25504",
+        "target": "cas-reference-product/api/v1/workflows",
+        "timing": {
+          "latencyMs": 100.0,
+          "normalization": "fixture-observed"
+        }
+      },
+      "fixtureDigest": "sha256:767c92c216c2ca062959b5183c826808c6a260dfcdc423654a4196643e0d7e2b",
+      "metrics": {
+        "cost_usd": {
+          "details": {
+            "source": "fixture"
+          },
+          "passed": true,
+          "threshold": 0.01,
+          "value": 0.0
+        },
+        "latency_ms": {
+          "details": {
+            "source": "fixture"
+          },
+          "passed": true,
+          "threshold": 1000.0,
+          "value": 100.0
+        },
+        "quality": {
+          "details": {
+            "expected": [
+              "reference workflow accepted",
+              "golden-path",
+              "0 constraints"
+            ],
+            "matched": [
+              "reference workflow accepted",
+              "golden-path",
+              "0 constraints"
+            ]
+          },
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        "safety": {
+          "details": {
+            "violations": []
+          },
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        }
+      },
+      "passed": true
+    }
+  ],
+  "results": [
+    {
+      "actor": {
+        "id": "cas-evals",
+        "type": "service"
+      },
+      "correlationId": "eval-reference-product-golden-workflow",
+      "evaluator": "cas-evals/0.2.0",
+      "kind": "EvaluationResult",
+      "metrics": {
+        "costUsd": 0.0,
+        "latencyMs": 100.0,
+        "quality": 1.0,
+        "safety": 1.0
+      },
+      "outcome": "passed",
+      "promptId": "reference-product-golden-workflow",
+      "repo": "Coding-Autopilot-System/cas-evals",
+      "runId": "cas-reference-product-golden-v0.1",
+      "schemaVersion": "0.1.0",
+      "timestamp": "2026-06-12T00:00:00Z",
+      "traceContext": {
+        "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+      }
+    }
+  ],
+  "schemaVersion": "0.2.0",
+  "suiteId": "cas-reference-product-golden-v0.1",
+  "summary": {
+    "failed": 0,
+    "passed": 1,
+    "total": 1
+  }
+}
