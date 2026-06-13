@@ -16,4 +16,5 @@ Invoke-Checked { & .\.venv\Scripts\python.exe -m pip install --disable-pip-versi
 Invoke-Checked { & .\.venv\Scripts\python.exe -m ruff check . }
 Invoke-Checked { & .\.venv\Scripts\python.exe -m mypy }
 Invoke-Checked { & .\.venv\Scripts\python.exe -m pytest }
+Invoke-Checked { & .\.venv\Scripts\python.exe -m cas_reference_product.evidence }
 Invoke-Checked { git -c safe.directory="$PWD" diff --check }

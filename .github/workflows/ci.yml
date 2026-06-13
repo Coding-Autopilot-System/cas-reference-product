@@ -21,4 +21,5 @@ jobs:
       - run: python -m ruff check .
       - run: python -m mypy
       - run: python -m pytest
+      - run: python -m cas_reference_product.evidence
       - run: docker build --platform linux/amd64 -t cas-reference-product:ci .

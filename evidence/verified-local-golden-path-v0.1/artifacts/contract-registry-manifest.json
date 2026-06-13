@@ -1,0 +1,45 @@
+{
+  "version": "0.1.0",
+  "schemas": [
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/artifact-manifest.schema.json",
+      "path": "artifact-manifest.schema.json",
+      "sha256": "2864e3ef2c7ab8114395d15a2f6b4b1e832049c0a3a2b8a1165ba287f61caa06"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/common.schema.json",
+      "path": "common.schema.json",
+      "sha256": "c7ce72a6f5da8394e48f2421820588a8142546962e05152997bd1e6ced994928"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/evaluation-result.schema.json",
+      "path": "evaluation-result.schema.json",
+      "sha256": "be6d3216c95cfa6d2ccda908ff089010765b1c70223a920bfe3cb70a0cd24df5"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/policy-decision.schema.json",
+      "path": "policy-decision.schema.json",
+      "sha256": "21a66d651f5c0190fe0b50b81350ab32d29190d1c44719e2584628a8e0e6614f"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/prompt-envelope.schema.json",
+      "path": "prompt-envelope.schema.json",
+      "sha256": "baf043344abe6bf9afbc31272bef8034ec46ffc4d3fc799a41fead002b7274d6"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/run-event.schema.json",
+      "path": "run-event.schema.json",
+      "sha256": "6e96cb3e690ab4fcbcbe75005b27c14d83595c4951cabc35bed86b41fc2f0a7f"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/verification-result.schema.json",
+      "path": "verification-result.schema.json",
+      "sha256": "3ef6085b19c726204b65c9f8fd815a8aa0dcda6a8db82acdbd61e56bce45b4c9"
+    },
+    {
+      "id": "https://schemas.coding-autopilot.dev/v0.1/work-request.schema.json",
+      "path": "work-request.schema.json",
+      "sha256": "7a6d5aee580d0198336c704cd9b154bc6c08bca15ec77be9c5db965cf54a9606"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "kind": "VerificationResult",
+  "correlationId": "cas-reference-product-golden-v0.1",
+  "promptId": "reference-product-golden-workflow",
+  "runId": "cas-reference-product-golden-v0.1",
+  "repo": "Coding-Autopilot-System/cas-reference-product",
+  "actor": {
+    "id": "evidence-bundle-ci",
+    "type": "workflow"
+  },
+  "timestamp": "2026-06-13T00:00:01Z",
+  "schemaVersion": "0.1.0",
+  "traceContext": {
+    "traceparent": "00-0f32a2f22b960e873c92cecabc6f8dea-afb7553009ebcb9d-01"
+  },
+  "outcome": "passed",
+  "checks": [
+    {
+      "name": "immutable-source-shas",
+      "outcome": "passed",
+      "evidenceUri": "urn:cas-evidence:verified-local-golden-path-v0.1:source-provenance"
+    },
+    {
+      "name": "contract-registry-manifest-digest",
+      "outcome": "passed",
+      "evidenceUri": "urn:cas-evidence:verified-local-golden-path-v0.1:contract-registry-manifest"
+    },
+    {
+      "name": "local-http-golden-path-evaluation",
+      "outcome": "passed",
+      "evidenceUri": "urn:cas-evidence:verified-local-golden-path-v0.1:eval-evidence"
+    },
+    {
+      "name": "platform-what-if-reference-no-deployment",
+      "outcome": "passed",
+      "evidenceUri": "urn:cas-evidence:verified-local-golden-path-v0.1:platform-what-if-reference"
+    },
+    {
+      "name": "reproducible-container-registry-digest",
+      "outcome": "skipped"
+    }
+  ]
+}
