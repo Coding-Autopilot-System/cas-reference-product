@@ -11,3 +11,4 @@ Dockerfile text eol=lf
 *.toml text eol=lf
 *.ps1 text eol=crlf
 tests/contracts/cas-contracts/v0.1.0/*.json -text -diff
+evidence/verified-local-golden-path-v0.1/artifacts/** -text -diff
