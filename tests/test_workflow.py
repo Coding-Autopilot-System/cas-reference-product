@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from unittest.mock import patch
 
 import pytest
 
@@ -17,9 +18,14 @@ class FailingService:
 
 def test_orchestrator_returns_traceable_events(envelope) -> None:
     fixed = datetime(2026, 6, 11, 10, 0, tzinfo=UTC)
-    result = WorkflowOrchestrator(
-        SuccessfulService(), envelope.repo, clock=lambda: fixed
-    ).execute(envelope)
+    # Patch current_traceparent so this unit test is provider-independent.
+    with patch(
+        "cas_reference_product.workflow.current_traceparent",
+        side_effect=lambda fallback: fallback,
+    ):
+        result = WorkflowOrchestrator(
+            SuccessfulService(), envelope.repo, clock=lambda: fixed
+        ).execute(envelope)
 
     assert result.output == "processed:prompt-001"
     assert [event.eventType for event in result.events] == [
