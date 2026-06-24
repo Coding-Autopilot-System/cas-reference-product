@@ -12,6 +12,25 @@ class FailingExternalService:
         raise WorkflowAgentServiceError("sensitive provider detail")
 
 
+def test_lifespan_invokes_configure_telemetry(envelope) -> None:
+    with patch("cas_reference_product.app.configure_telemetry") as mock_configure:
+        with TestClient(create_app(Settings())):
+            mock_configure.assert_called_once()
+
+
+def test_workflow_api_returns_503_when_service_is_none(envelope) -> None:
+    with patch(
+        "cas_reference_product.app.build_workflow_agent_service",
+        return_value=None,
+    ):
+        client = TestClient(create_app(Settings()))
+
+    response = client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "Workflow backend is not ready"}
+
+
 def test_workflow_api_emits_canonical_events(envelope) -> None:
     client = TestClient(create_app(Settings()))
 

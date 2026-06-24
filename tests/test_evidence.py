@@ -1,10 +1,19 @@
 import hashlib
 import json
+import sys
+from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
-from cas_reference_product.evidence import DEFAULT_BUNDLE, EvidenceVerificationError, verify_bundle
+from cas_reference_product.evidence import (
+    DEFAULT_BUNDLE,
+    EvidenceVerificationError,
+    _load_json,
+    main,
+    verify_bundle,
+)
 
 
 def copy_bundle(tmp_path: Path) -> Path:
@@ -20,6 +29,41 @@ def copy_bundle(tmp_path: Path) -> Path:
 
 def write_json(path: Path, payload: dict[str, object]) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def update_digest_in_descriptor(bundle: Path, section_key: str, path_key: str = "path") -> None:
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    target_path = bundle / descriptor[section_key][path_key]
+    new_digest = hashlib.sha256(target_path.read_bytes()).hexdigest()
+    descriptor[section_key]["sha256"] = new_digest
+    write_json(descriptor_path, descriptor)
+
+
+def rebuild_all_digests(bundle: Path) -> None:
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+
+    uri_to_path = {a["uri"]: a["path"] for a in descriptor["artifacts"]}
+
+    for artifact in descriptor["artifacts"]:
+        artifact_path = bundle / artifact["path"]
+        artifact["sha256"] = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+
+    for section in ("sourceProvenance", "contractRegistry", "evaluation", "platformWhatIf"):
+        sect = descriptor[section]
+        sect["sha256"] = hashlib.sha256((bundle / sect["path"]).read_bytes()).hexdigest()
+
+    write_json(descriptor_path, descriptor)
+
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    uri_to_sha = {a["uri"]: a["sha256"] for a in descriptor["artifacts"]}
+
+    manifest_path = bundle / "artifact-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for artifact in manifest["artifacts"]:
+        artifact["sha256"] = uri_to_sha[artifact["uri"]]
+    write_json(manifest_path, manifest)
 
 
 def test_committed_immutable_evidence_bundle_verifies() -> None:
@@ -124,3 +168,162 @@ def test_evaluation_response_digest_is_mandatory(tmp_path: Path) -> None:
 
     with pytest.raises(EvidenceVerificationError, match="evaluation fixture digest mismatch"):
         verify_bundle(bundle)
+
+
+def test_load_json_rejects_non_object_json(tmp_path: Path) -> None:
+    array_file = tmp_path / "array.json"
+    array_file.write_text("[1, 2, 3]", encoding="utf-8")
+
+    with pytest.raises(EvidenceVerificationError, match="must contain a JSON object"):
+        _load_json(array_file)
+
+
+def test_bundle_artifacts_must_be_a_non_empty_list(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["artifacts"] = []
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="bundle artifacts must be a non-empty list"):
+        verify_bundle(bundle)
+
+
+def test_bundle_artifact_entry_must_be_a_dict(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["artifacts"] = ["not-a-dict"]
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="bundle artifact entries must be objects"):
+        verify_bundle(bundle)
+
+
+def test_artifact_missing_path_or_sha256_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["artifacts"] = [{"uri": "urn:test", "path": None, "sha256": None}]
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="artifact path and sha256 must be strings"):
+        verify_bundle(bundle)
+
+
+def test_artifact_sha256_with_invalid_pattern_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["artifacts"] = [
+        {"uri": "urn:test", "path": "artifact-manifest.json", "sha256": "not-a-valid-hash"}
+    ]
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="has an invalid SHA-256 digest"):
+        verify_bundle(bundle)
+
+
+def test_artifact_path_traversal_outside_bundle_root_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    valid_sha = "a" * 64
+    descriptor["artifacts"] = [
+        {"uri": "urn:test", "path": "../../outside.json", "sha256": valid_sha}
+    ]
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="escapes the bundle root"):
+        verify_bundle(bundle)
+
+
+def test_invalid_git_sha_in_source_provenance_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    provenance_path = bundle / "artifacts" / "source-provenance.json"
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    provenance["repositories"][0]["sha"] = "not-a-git-sha"
+    write_json(provenance_path, provenance)
+    rebuild_all_digests(bundle)
+
+    with pytest.raises(EvidenceVerificationError, match="invalid immutable source reference"):
+        verify_bundle(bundle)
+
+
+def test_evaluation_summary_mismatch_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    eval_path = bundle / "artifacts" / "eval-evidence.json"
+    evaluation = json.loads(eval_path.read_text(encoding="utf-8"))
+    evaluation["summary"] = {"failed": 1, "passed": 0, "total": 1}
+    write_json(eval_path, evaluation)
+    rebuild_all_digests(bundle)
+
+    with pytest.raises(EvidenceVerificationError, match="golden path evaluation did not pass exactly one case"):
+        verify_bundle(bundle)
+
+
+def test_evaluation_suite_id_mismatch_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    eval_path = bundle / "artifacts" / "eval-evidence.json"
+    evaluation = json.loads(eval_path.read_text(encoding="utf-8"))
+    evaluation["suiteId"] = "wrong-suite-id"
+    write_json(eval_path, evaluation)
+    rebuild_all_digests(bundle)
+
+    with pytest.raises(EvidenceVerificationError, match="unexpected golden path evaluation suite"):
+        verify_bundle(bundle)
+
+
+def test_evaluation_response_digest_wrong_in_evidence_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    eval_path = bundle / "artifacts" / "eval-evidence.json"
+    evaluation = json.loads(eval_path.read_text(encoding="utf-8"))
+    evaluation["evidence"][0]["execution"]["responseDigest"] = "sha256:" + "0" * 64
+    write_json(eval_path, evaluation)
+    rebuild_all_digests(bundle)
+
+    with pytest.raises(EvidenceVerificationError, match="evaluation response digest mismatch"):
+        verify_bundle(bundle)
+
+
+def test_available_container_with_invalid_digest_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["containerImage"] = {"status": "available", "digest": "not-a-valid-digest"}
+    write_json(descriptor_path, descriptor)
+
+    with pytest.raises(EvidenceVerificationError, match="available container image requires a valid digest"):
+        verify_bundle(bundle)
+
+
+def test_verification_result_outcome_not_passed_raises(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    result_path = bundle / "verification-result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["outcome"] = "failed"
+    write_json(result_path, result)
+
+    with pytest.raises(EvidenceVerificationError, match="canonical VerificationResult must pass"):
+        verify_bundle(bundle)
+
+
+def test_main_returns_zero_on_valid_bundle() -> None:
+    with patch.object(sys, "argv", ["evidence"]):
+        assert main() == 0
+
+
+def test_main_returns_one_on_invalid_bundle_path() -> None:
+    with patch.object(sys, "argv", ["evidence", "/nonexistent/path/bundle"]):
+        assert main() == 1
+
+
+def test_main_returns_one_on_verification_failure(tmp_path: Path) -> None:
+    bundle = copy_bundle(tmp_path)
+    descriptor_path = bundle / "bundle.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    descriptor["platformWhatIf"]["deploymentClaim"] = "deployed"
+    write_json(descriptor_path, descriptor)
+
+    with patch.object(sys, "argv", ["evidence", str(bundle)]):
+        assert main() == 1
