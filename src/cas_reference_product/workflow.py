@@ -3,14 +3,12 @@ from datetime import UTC, datetime
 from typing import Literal, Protocol
 
 from azure.ai.projects import AIProjectClient
-from opentelemetry import trace
 
 from .config import Settings
 from .identity import build_credential
 from .models import Actor, PromptEnvelope, RunEvent, TraceContext, WorkflowResult
-from .telemetry import current_traceparent
+from .telemetry import LoopStage, current_traceparent, start_loop_span
 
-tracer = trace.get_tracer(__name__)
 RunStatus = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -47,7 +45,7 @@ class FoundryWorkflowAgentService:
         ).get_openai_client()
 
     def run(self, envelope: PromptEnvelope) -> str:
-        with tracer.start_as_current_span("foundry.responses.create"):
+        with start_loop_span(LoopStage.FOUNDRY, envelope.correlationId):
             try:
                 response = self._client.responses.create(
                     input=envelope.prompt,
@@ -81,7 +79,7 @@ class WorkflowOrchestrator:
         self._clock = clock
 
     def execute(self, envelope: PromptEnvelope) -> WorkflowResult:
-        with tracer.start_as_current_span("cas.workflow.execute") as span:
+        with start_loop_span(LoopStage.WORKER, envelope.correlationId) as span:
             span.set_attribute("cas.correlation_id", envelope.correlationId)
             events = [self._event(envelope, 0, "workflow.started", "running", "Workflow started.")]
             try:

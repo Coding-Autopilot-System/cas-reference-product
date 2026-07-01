@@ -1,4 +1,7 @@
 from collections.abc import Awaitable, Callable
+from contextlib import AbstractContextManager
+from enum import StrEnum
+from typing import Any
 
 from opentelemetry import context, propagate, trace
 from opentelemetry.propagators.composite import CompositePropagator
@@ -11,6 +14,32 @@ from .config import Settings
 from .identity import build_credential
 
 tracer = trace.get_tracer(__name__)
+
+
+class LoopStage(StrEnum):
+    CONTROL_PLANE = "control_plane"
+    WORKER = "worker"
+    TOOL = "tool"
+    VERIFIER = "verifier"
+    FOUNDRY = "foundry"
+
+
+def start_loop_span(
+    stage: LoopStage,
+    correlation_id: str,
+    *,
+    goal_id: str | None = None,
+    work_item_id: str | None = None,
+) -> AbstractContextManager[Any]:
+    attributes = {
+        "cas.stage": stage.value,
+        "cas.correlation_id": correlation_id,
+    }
+    if goal_id is not None:
+        attributes["cas.goal_id"] = goal_id
+    if work_item_id is not None:
+        attributes["cas.work_item_id"] = work_item_id
+    return tracer.start_as_current_span(f"cas.loop.{stage.value}", attributes=attributes)
 
 
 # ---------------------------------------------------------------------------

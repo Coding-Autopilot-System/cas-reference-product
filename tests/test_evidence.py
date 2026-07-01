@@ -1,7 +1,6 @@
 import hashlib
 import json
 import sys
-from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -43,8 +42,6 @@ def update_digest_in_descriptor(bundle: Path, section_key: str, path_key: str = 
 def rebuild_all_digests(bundle: Path) -> None:
     descriptor_path = bundle / "bundle.json"
     descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
-
-    uri_to_path = {a["uri"]: a["path"] for a in descriptor["artifacts"]}
 
     for artifact in descriptor["artifacts"]:
         artifact_path = bundle / artifact["path"]
@@ -185,7 +182,10 @@ def test_bundle_artifacts_must_be_a_non_empty_list(tmp_path: Path) -> None:
     descriptor["artifacts"] = []
     write_json(descriptor_path, descriptor)
 
-    with pytest.raises(EvidenceVerificationError, match="bundle artifacts must be a non-empty list"):
+    with pytest.raises(
+        EvidenceVerificationError,
+        match="bundle artifacts must be a non-empty list",
+    ):
         verify_bundle(bundle)
 
 
@@ -258,7 +258,10 @@ def test_evaluation_summary_mismatch_raises(tmp_path: Path) -> None:
     write_json(eval_path, evaluation)
     rebuild_all_digests(bundle)
 
-    with pytest.raises(EvidenceVerificationError, match="golden path evaluation did not pass exactly one case"):
+    with pytest.raises(
+        EvidenceVerificationError,
+        match="golden path evaluation did not pass exactly one case",
+    ):
         verify_bundle(bundle)
 
 
@@ -293,7 +296,10 @@ def test_available_container_with_invalid_digest_raises(tmp_path: Path) -> None:
     descriptor["containerImage"] = {"status": "available", "digest": "not-a-valid-digest"}
     write_json(descriptor_path, descriptor)
 
-    with pytest.raises(EvidenceVerificationError, match="available container image requires a valid digest"):
+    with pytest.raises(
+        EvidenceVerificationError,
+        match="available container image requires a valid digest",
+    ):
         verify_bundle(bundle)
 
 
