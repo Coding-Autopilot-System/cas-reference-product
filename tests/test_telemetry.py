@@ -5,11 +5,19 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
+from cas_reference_product import telemetry
 from cas_reference_product.app import create_app
 from cas_reference_product.config import Settings
-from cas_reference_product.telemetry import configure_telemetry, current_traceparent, install_propagator
+from cas_reference_product.telemetry import (
+    LoopStage,
+    configure_telemetry,
+    current_traceparent,
+    install_propagator,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -71,6 +79,47 @@ def test_invalid_span_preserves_incoming_traceparent() -> None:
         value = current_traceparent(incoming)
 
     assert value == incoming
+
+
+def test_valid_span_returns_formatted_traceparent() -> None:
+    with patch("cas_reference_product.telemetry.trace.get_current_span") as current:
+        span = MagicMock()
+        ctx = MagicMock()
+        ctx.is_valid = True
+        ctx.trace_id = 0x4BF92F3577B34DA6A3CE929D0E0E4736
+        ctx.span_id = 0x00F067AA0BA902B7
+        span.get_span_context.return_value = ctx
+        current.return_value = span
+
+        value = current_traceparent("fallback")
+
+    assert value == "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+
+
+def test_all_loop_stages_share_one_trace_without_prompt_or_output_attributes() -> None:
+    exporter = InMemorySpanExporter()
+    provider = TracerProvider()
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+
+    with patch.object(telemetry, "tracer", provider.get_tracer("test")):
+        with telemetry.start_loop_span(LoopStage.CONTROL_PLANE, "corr-1", goal_id="goal-1"):
+            for stage in (
+                LoopStage.WORKER,
+                LoopStage.TOOL,
+                LoopStage.VERIFIER,
+                LoopStage.FOUNDRY,
+            ):
+                with telemetry.start_loop_span(stage, "corr-1", work_item_id="work-1"):
+                    pass
+
+    spans = exporter.get_finished_spans()
+    assert {span.attributes["cas.stage"] for span in spans} == {stage.value for stage in LoopStage}
+    assert len({span.context.trace_id for span in spans}) == 1
+    assert all(
+        "prompt" not in key and "output" not in key
+        for span in spans
+        for key in span.attributes
+    )
 
 
 # ---------------------------------------------------------------------------

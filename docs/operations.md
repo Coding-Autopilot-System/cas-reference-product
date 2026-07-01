@@ -34,3 +34,13 @@ Build a Linux AMD64 image and pass its immutable image reference to the `contain
 The Docker build context excludes local `.env` files and development artifacts. The application does
 not consume platform resource IDs; deployment orchestration retains those outputs for RBAC and
 operations workflows.
+# Flex ingress validation
+
+Build the infrastructure locally before any reviewed deployment:
+
+```powershell
+az bicep build --file infra/main.bicep
+az deployment group what-if --resource-group <resource-group> --template-file infra/main.bicep --parameters foundryProjectResourceId=<resource-id>
+```
+
+Deployment is intentionally not performed by repository validation. A rollout must publish the function package separately, verify the system-assigned principal's project-scoped and storage-scoped role assignments, submit one synthetic envelope, and confirm a queue message and correlated Application Insights spans. Rollback disables ingress or restores the prior function package; storage and identity resources are retained to avoid destructive replacement.
