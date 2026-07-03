@@ -1,0 +1,109 @@
+{
+  "activeIntents": [
+    {
+      "agentName": "User CLI",
+      "toolType": "lint",
+      "intent": "continue",
+      "timestamp": "2026-06-22T14:31:03.992Z",
+      "expiresAt": "2026-06-22T15:01:03.992Z",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    }
+  ],
+  "logs": [
+    {
+      "timestamp": "2026-06-22T14:31:04.083Z",
+      "message": "Found 3 total gaps (Rule: 3, Semantic: 0).",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-22T14:31:03.993Z",
+      "message": "Scouting project for prompt: \"continue...\"",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-22T14:31:03.992Z",
+      "message": "Agent [User CLI] intent: continue...",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-22T14:31:03.989Z",
+      "message": "MCP Call: lint_prompt",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-19T10:49:15.799Z",
+      "message": "Found 3 total gaps (Rule: 3, Semantic: 0).",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-19T10:49:15.766Z",
+      "message": "Scouting project for prompt: \"continue...\"",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-19T10:49:15.766Z",
+      "message": "Agent [User CLI] intent: continue...",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-19T10:49:15.756Z",
+      "message": "MCP Call: lint_prompt",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:48:08.870Z",
+      "message": "Found 3 total gaps (Rule: 3, Semantic: 0).",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:48:08.836Z",
+      "message": "Scouting project for prompt: \"congtinue...\"",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:48:08.836Z",
+      "message": "Agent [User CLI] intent: congtinue...",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:48:08.834Z",
+      "message": "MCP Call: lint_prompt",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:46:25.840Z",
+      "message": "Recording agent output for prompt prm_178153...",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:46:25.839Z",
+      "message": "MCP Call: record_agent_output",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:30:33.304Z",
+      "message": "Found 3 total gaps (Rule: 3, Semantic: 0).",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:30:33.269Z",
+      "message": "Scouting project for prompt: \"continue...\"",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:30:33.268Z",
+      "message": "Agent [User CLI] intent: continue...",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-15T15:30:33.267Z",
+      "message": "MCP Call: lint_prompt",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    },
+    {
+      "timestamp": "2026-06-14T19:45:49.064Z",
+      "message": "Found 2 total gaps (Rule: 2, Semantic: 0).",
+      "projectPath": "C:\\PersonalRepo\\portfolio\\cas-reference-product"
+    }
+  ]
+}
