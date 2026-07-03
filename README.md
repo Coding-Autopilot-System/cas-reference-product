@@ -1,5 +1,8 @@
 # CAS Reference Product
 
+[![CI](https://github.com/Coding-Autopilot-System/cas-reference-product/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Autopilot-System/cas-reference-product/actions/workflows/ci.yml) [![CodeQL](https://github.com/Coding-Autopilot-System/cas-reference-product/actions/workflows/codeql.yml/badge.svg)](https://github.com/Coding-Autopilot-System/cas-reference-product/actions/workflows/codeql.yml)
+
+
 Public v0.1 reference application for the Coding Autopilot System and Microsoft Foundry Next Gen Agents.
 
 It runs a useful deterministic workflow locally, emits canonical [`cas-contracts`](https://github.com/Coding-Autopilot-System/cas-contracts) v0.1 lifecycle events, and includes a Foundry adapter that invokes a Next Gen agent reference through the project Responses client. It is designed for the Container Apps and managed identity boundary supplied by [`cas-platform`](https://github.com/Coding-Autopilot-System/cas-platform).
