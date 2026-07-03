@@ -10,3 +10,6 @@ build/
 .env
 .foundry/results/
 
+# Claude Code session worktrees — never commit these
+.claude/worktrees/
+
