@@ -1,46 +1,74 @@
 # Architecture
 
-```text
-Caller
-  -> FastAPI boundary (:8080)
-     -> PromptEnvelope validation (cas-contracts v0.1)
-     -> WorkflowOrchestrator
-        -> LocalWorkflowAgentService (default)
-        -> FoundryWorkflowAgentService (configured)
-           -> AIProjectClient project Responses client
-           -> Next Gen agent_reference
-     -> canonical RunEvent records
-     -> OpenTelemetry spans
-        -> Application Insights when deployment injects configuration
+The CAS Reference Product implements a robust boundary for the Coding Autopilot System, designed for deployment within an Azure Container Apps environment. The application uses a strictly typed schema for interactions, adopting canonical `cas-contracts` data structures.
+
+## System Architecture
+
+The following diagram visualizes the primary request flow and components within the application:
+
+```mermaid
+flowchart TD
+    Client[Client] -->|POST /api/v1/workflows\nPromptEnvelope| FastAPI[FastAPI Server\napp.py]
+    
+    subgraph Core Application
+        FastAPI --> Middleware[W3CTraceContextMiddleware\ntelemetry.py]
+        Middleware --> Router[Workflow Router]
+        Router --> Orchestrator[WorkflowOrchestrator\nworkflow.py]
+        
+        Orchestrator -->|Start Event| EventGen[RunEvent Generator\nmodels.py]
+        Orchestrator --> AgentService{WorkflowAgentService\nworkflow.py}
+        
+        AgentService -->|Local Config| LocalAgent[LocalWorkflowAgentService]
+        AgentService -->|Foundry Config| FoundryAgent[FoundryWorkflowAgentService]
+    end
+    
+    subgraph External Infrastructure
+        FoundryAgent -->|Managed Identity| AzureAuth[Azure DefaultAzureCredential\nidentity.py]
+        AzureAuth -->|Responses API| AzureAI[Azure AI Projects API]
+        AzureAI -->|Invoke Agent| FoundryNextGen[Foundry Next Gen Agent]
+    end
+    
+    LocalAgent -->|Deterministic Output| Orchestrator
+    FoundryAgent -->|Agent Output| Orchestrator
+    
+    Orchestrator -->|Complete Event| EventGen
+    EventGen -->|WorkflowResult\nRunEvent| Router
+    Router -->|200 OK| Client
+    
+    style FastAPI fill:#0a5c43,stroke:#fff,color:#fff
+    style Orchestrator fill:#2d3748,stroke:#fff,color:#fff
+    style AgentService fill:#b3531b,stroke:#fff,color:#fff
+    style FoundryNextGen fill:#0d6efd,stroke:#fff,color:#fff
 ```
 
-The application owns workflow orchestration and lifecycle records. Foundry owns agent execution. `cas-platform` owns Container Apps, system-assigned identity, diagnostic settings, Log Analytics, and Application Insights resources.
+## Component Breakdown
 
-Foundry mode uses `ManagedIdentityCredential()` for every non-local environment. Local mode uses `DefaultAzureCredential()` only for developer convenience. No Classic Assistants API is used.
+1. **FastAPI Web Layer (`app.py`)**:
+   - Exposes `/api/v1/workflows` for execution.
+   - Provides `/health/live` and `/health/ready` for Kubernetes/Container Apps probes.
+   - Manages OpenTelemetry spans, tracking request context via `PromptEnvelope.correlationId`.
 
-The Foundry call is isolated behind the `WorkflowAgentService` protocol. This keeps core lifecycle behavior deterministic and testable while making the external service boundary explicit.
+2. **Telemetry (`telemetry.py`)**:
+   - `W3CTraceContextMiddleware` ensures trace headers (`traceparent`, `tracestate`) are parsed and propagated properly across distributed systems.
 
-## Deployment Interface
+3. **Workflow Orchestrator (`workflow.py`)**:
+   - Wraps the execution of the agent.
+   - Emits canonical `RunEvent` data points (e.g., `workflow.started`, `workflow.completed`, `workflow.failed`).
+   - Packages the final execution into a `WorkflowResult`.
 
-`deployment/cas-platform.interface.yaml` records the application contract: Linux AMD64 image, port
-8080, internal ingress by default, system-assigned identity, probes, and configuration inputs. It does
-not deploy resources.
+4. **Workflow Agent Service (`workflow.py`)**:
+   - The application boundary for AI logic.
+   - **Local Mode**: Bypasses the cloud entirely. Returns a deterministic output confirming the intake of constraints and intents. Useful for integration testing.
+   - **Foundry Mode**: Uses `AIProjectClient` to invoke a designated Foundry Next Gen agent using the Responses API.
 
-The application consumes only the environment values listed in that interface. Platform resource IDs
-and principal IDs remain deployment-orchestration outputs and are not application configuration.
+5. **Data Models (`models.py`)**:
+   - Strongly typed Pydantic models.
+   - Requires explicit non-null values, enforcing high-quality data across boundaries (e.g., `PromptEnvelope`, `RunEvent`, `Actor`, `TraceContext`).
 
-## Observability Boundaries
+6. **Identity (`identity.py`)**:
+   - Uses `DefaultAzureCredential` for local development or system-assigned `ManagedIdentityCredential` in Azure.
+   - Follows security best practices by strictly avoiding hardcoded secrets or API keys.
 
-- Incoming HTTP requests are instrumented by Azure Monitor OpenTelemetry when configured.
-- `cas.workflow.execute` covers core orchestration.
-- `foundry.responses.create` covers the external Foundry call.
-- CAS correlation IDs are attached to workflow spans and canonical events preserve W3C trace context.
-- Broad Azure SDK and outbound HTTP auto-instrumentation is disabled to avoid capturing prompt or
-  output content. The application records only explicit boundary spans and safe identifiers.
-# Loop execution boundaries
+## Deployment Strategy
 
-The public HTTP ingress is an Azure Functions Flex Consumption Linux app. It validates the canonical prompt envelope and returns `202` only after handing the message to Azure Queue Storage. It never invokes Foundry, executes tools, or runs sandbox work in the request process. A separately scaled worker owns those long-running operations.
-
-The ingress uses a system-assigned managed identity. Bicep grants Storage Queue Data Contributor on the workload storage account and Azure AI User on the specific Foundry project. No account keys, API keys, or connection-string credentials are materialized. Local development continues to use `DefaultAzureCredential`; Azure environments use `ManagedIdentityCredential`.
-
-Loop spans use W3C trace context and the fixed stages `control_plane`, `worker`, `tool`, `verifier`, and `foundry`. Attributes are limited to correlation, goal, and work-item identifiers; prompts and model output are not telemetry attributes.
+The application is meant to be packaged as a Docker container, running rootless. It's built for the **cas-platform** ecosystem, which dictates the Azure resources, network topology, and Managed Identity mappings externally.
