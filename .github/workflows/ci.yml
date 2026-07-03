@@ -21,6 +21,10 @@ jobs:
       - run: python -m pip install -e ".[dev]"
       - run: python -m ruff check .
       - run: python -m mypy
+      - name: Contract compatibility (pinned cas-contracts v0.1)
+        # Consumer-side gate: fails red if the pinned CAS contract version or the
+        # vendored v0.1 schema release drifts from what the Pydantic models emit.
+        run: python -m pytest tests/test_contract_registry.py -q --tb=short -o addopts=""
       - run: python -m pytest
       - run: python -m cas_reference_product.evidence
 

@@ -1,5 +1,6 @@
 """Tests for Phase 2 — Telemetry Hardening (TEL-01 through TEL-04)."""
 
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
@@ -110,12 +111,13 @@ def test_all_loop_stages_share_one_trace_without_prompt_or_output_attributes() -
                     pass
 
     spans = exporter.get_finished_spans()
-    assert {span.attributes["cas.stage"] for span in spans} == {stage.value for stage in LoopStage}
+    stage_values = {stage.value for stage in LoopStage}
+    assert {span.attributes["cas.stage"] for span in spans if span.attributes} == stage_values
     assert len({span.context.trace_id for span in spans}) == 1
     assert all(
         "prompt" not in key and "output" not in key
         for span in spans
-        for key in span.attributes
+        for key in (span.attributes or {})
     )
 
 
@@ -140,7 +142,9 @@ def test_install_propagator_sets_w3c_propagator() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_workflow_endpoint_creates_span(in_memory_exporter: InMemorySpanExporter, envelope) -> None:
+def test_workflow_endpoint_creates_span(
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
+) -> None:
     client = TestClient(create_app(Settings()))
     response = client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
 
@@ -157,12 +161,15 @@ def test_workflow_endpoint_creates_span(in_memory_exporter: InMemorySpanExporter
 # ---------------------------------------------------------------------------
 
 
-def test_workflow_span_attributes(in_memory_exporter: InMemorySpanExporter, envelope) -> None:
+def test_workflow_span_attributes(
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
+) -> None:
     client = TestClient(create_app(Settings()))
     client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
 
     spans = in_memory_exporter.get_finished_spans()
     api_span = next(s for s in spans if s.name == "cas.api.workflows.execute")
+    assert api_span.attributes
     assert api_span.attributes.get("cas.correlation_id") == envelope.correlationId
     assert api_span.attributes.get("cas.run_id") == envelope.runId
     assert api_span.attributes.get("cas.intent") == envelope.intent
@@ -174,7 +181,7 @@ def test_workflow_span_attributes(in_memory_exporter: InMemorySpanExporter, enve
 
 
 def test_workflow_span_events_started_and_completed(
-    in_memory_exporter: InMemorySpanExporter, envelope
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
 ) -> None:
     client = TestClient(create_app(Settings()))
     client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
@@ -188,12 +195,12 @@ def test_workflow_span_events_started_and_completed(
 
 
 def test_workflow_span_events_started_and_failed(
-    in_memory_exporter: InMemorySpanExporter, envelope
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
 ) -> None:
     from cas_reference_product.workflow import WorkflowAgentServiceError
 
     class FailingService:
-        def run(self, _env) -> str:
+        def run(self: "Any", _env: "Any") -> str:
             raise WorkflowAgentServiceError("backend down")
 
     with patch(
@@ -213,7 +220,7 @@ def test_workflow_span_events_started_and_failed(
 
 
 def test_span_event_carries_correlation_id(
-    in_memory_exporter: InMemorySpanExporter, envelope
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
 ) -> None:
     client = TestClient(create_app(Settings()))
     client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
@@ -221,6 +228,7 @@ def test_span_event_carries_correlation_id(
     spans = in_memory_exporter.get_finished_spans()
     api_span = next(s for s in spans if s.name == "cas.api.workflows.execute")
     started_event = next(e for e in api_span.events if e.name == "workflow.started")
+    assert started_event.attributes
     assert started_event.attributes.get("cas.correlation_id") == envelope.correlationId
     assert started_event.attributes.get("cas.run_id") == envelope.runId
 
@@ -231,7 +239,7 @@ def test_span_event_carries_correlation_id(
 
 
 def test_w3c_traceparent_propagated_inbound(
-    in_memory_exporter: InMemorySpanExporter, envelope
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
 ) -> None:
     """Request with a W3C traceparent header links the API span as a child."""
     incoming_traceparent = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"

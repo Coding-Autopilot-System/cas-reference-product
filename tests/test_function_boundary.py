@@ -1,11 +1,12 @@
 import json
+from typing import Any
 
 import pytest
 
 from cas_reference_product.ingress import InvalidIngressRequest, create_worker_message
 
 
-def test_ingress_validates_and_serializes_canonical_envelope(envelope) -> None:
+def test_ingress_validates_and_serializes_canonical_envelope(envelope: "Any") -> None:
     message = create_worker_message(envelope.model_dump_json().encode())
 
     assert json.loads(message)["runId"] == envelope.runId

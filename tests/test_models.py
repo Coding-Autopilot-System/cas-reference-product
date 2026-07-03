@@ -1,10 +1,12 @@
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
 from cas_reference_product.models import Actor, PromptEnvelope, RunEvent, TraceContext
 
 
-def test_prompt_envelope_rejects_extra_properties(envelope) -> None:
+def test_prompt_envelope_rejects_extra_properties(envelope: "Any") -> None:
     payload = envelope.model_dump()
     payload["secret"] = "not-allowed"
 
@@ -12,7 +14,7 @@ def test_prompt_envelope_rejects_extra_properties(envelope) -> None:
         PromptEnvelope.model_validate(payload)
 
 
-def test_prompt_envelope_matches_cas_contract_metadata(envelope) -> None:
+def test_prompt_envelope_matches_cas_contract_metadata(envelope: "Any") -> None:
     payload = envelope.model_dump(mode="json")
 
     assert payload["kind"] == "PromptEnvelope"
@@ -28,7 +30,9 @@ def test_prompt_envelope_matches_cas_contract_metadata(envelope) -> None:
         ["No secrets", "No secrets"],
     ],
 )
-def test_prompt_envelope_enforces_cas_contract_constraints(envelope, constraints) -> None:
+def test_prompt_envelope_enforces_cas_contract_constraints(
+    envelope: "Any", constraints: "Any"
+) -> None:
     payload = envelope.model_dump()
     payload["constraints"] = constraints
 
@@ -67,6 +71,6 @@ def test_prompt_envelope_enforces_cas_contract_constraints(envelope, constraints
         ),
     ],
 )
-def test_contract_models_reject_explicit_null_optional_fields(model, payload) -> None:
+def test_contract_models_reject_explicit_null_optional_fields(model: "Any", payload: "Any") -> None:
     with pytest.raises(ValidationError):
         model.model_validate(payload)
