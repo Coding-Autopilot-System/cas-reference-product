@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -39,7 +40,7 @@ def test_foundry_service_rejects_invalid_project_endpoint() -> None:
         FoundryWorkflowAgentService(settings)
 
 
-def test_foundry_service_uses_next_gen_agent_reference(envelope) -> None:
+def test_foundry_service_uses_next_gen_agent_reference(envelope: "Any") -> None:
     settings = Settings(
         environment="prod",
         workflow_backend="foundry",
@@ -71,7 +72,7 @@ def test_foundry_service_uses_next_gen_agent_reference(envelope) -> None:
     assert result == "Foundry result"
 
 
-def test_foundry_service_sanitizes_sdk_failure(envelope) -> None:
+def test_foundry_service_sanitizes_sdk_failure(envelope: "Any") -> None:
     settings = Settings(
         environment="prod",
         workflow_backend="foundry",

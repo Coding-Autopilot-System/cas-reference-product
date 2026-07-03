@@ -12,7 +12,8 @@ CONTRACT_ROOT = Path(__file__).parent / "contracts" / "cas-contracts" / "v0.1.0"
 
 
 def load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    from typing import cast
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 def contract_registry() -> Registry[Any]:
@@ -37,11 +38,11 @@ def test_vendored_contract_release_matches_manifest_hashes() -> None:
         assert hashlib.sha256(content).hexdigest() == entry["sha256"]
 
 
-def test_prompt_envelope_serialization_conforms_to_v010_registry(envelope) -> None:
+def test_prompt_envelope_serialization_conforms_to_v010_registry(envelope: "Any") -> None:
     assert_valid("prompt-envelope.schema.json", envelope.model_dump(mode="json"))
 
 
-def test_run_event_serialization_conforms_to_v010_registry(envelope) -> None:
+def test_run_event_serialization_conforms_to_v010_registry(envelope: "Any") -> None:
     result = WorkflowOrchestrator(LocalWorkflowAgentService(), envelope.repo).execute(envelope)
 
     for event in result.events:

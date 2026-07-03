@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -8,11 +9,11 @@ from cas_reference_product.workflow import WorkflowAgentServiceError
 
 
 class FailingExternalService:
-    def run(self, envelope) -> str:
+    def run(self: "Any", envelope: "Any") -> str:
         raise WorkflowAgentServiceError("sensitive provider detail")
 
 
-def test_workflow_api_emits_canonical_events(envelope) -> None:
+def test_workflow_api_emits_canonical_events(envelope: "Any") -> None:
     client = TestClient(create_app(Settings()))
 
     response = client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
@@ -56,7 +57,7 @@ def test_invalid_foundry_endpoint_is_not_ready() -> None:
     assert client.get("/health/ready").status_code == 503
 
 
-def test_workflow_api_sanitizes_external_service_failures(envelope) -> None:
+def test_workflow_api_sanitizes_external_service_failures(envelope: "Any") -> None:
     with patch(
         "cas_reference_product.app.build_workflow_agent_service",
         return_value=FailingExternalService(),
