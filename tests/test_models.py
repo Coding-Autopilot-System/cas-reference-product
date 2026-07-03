@@ -1,4 +1,5 @@
 from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
@@ -29,7 +30,9 @@ def test_prompt_envelope_matches_cas_contract_metadata(envelope: "Any") -> None:
         ["No secrets", "No secrets"],
     ],
 )
-def test_prompt_envelope_enforces_cas_contract_constraints(envelope: "Any", constraints: "Any") -> None:
+def test_prompt_envelope_enforces_cas_contract_constraints(
+    envelope: "Any", constraints: "Any"
+) -> None:
     payload = envelope.model_dump()
     payload["constraints"] = constraints
 

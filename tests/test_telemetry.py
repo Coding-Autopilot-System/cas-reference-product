@@ -1,6 +1,6 @@
-from typing import Any
 """Tests for Phase 2 — Telemetry Hardening (TEL-01 through TEL-04)."""
 
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
@@ -142,7 +142,9 @@ def test_install_propagator_sets_w3c_propagator() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_workflow_endpoint_creates_span(in_memory_exporter: InMemorySpanExporter, envelope: "Any") -> None:
+def test_workflow_endpoint_creates_span(
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
+) -> None:
     client = TestClient(create_app(Settings()))
     response = client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
 
@@ -159,7 +161,9 @@ def test_workflow_endpoint_creates_span(in_memory_exporter: InMemorySpanExporter
 # ---------------------------------------------------------------------------
 
 
-def test_workflow_span_attributes(in_memory_exporter: InMemorySpanExporter, envelope: "Any") -> None:
+def test_workflow_span_attributes(
+    in_memory_exporter: InMemorySpanExporter, envelope: "Any"
+) -> None:
     client = TestClient(create_app(Settings()))
     client.post("/api/v1/workflows", json=envelope.model_dump(mode="json"))
 
