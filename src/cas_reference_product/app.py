@@ -13,6 +13,10 @@ from .workflow import WorkflowAgentServiceError, WorkflowOrchestrator, build_wor
 _tracer = trace.get_tracer(__name__)
 
 
+def _raise_workflow_backend_failure(error: WorkflowAgentServiceError) -> None:
+    raise HTTPException(status_code=502, detail="Workflow backend request failed") from error
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or get_settings()
 
@@ -55,7 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             orchestrator = WorkflowOrchestrator(service, app_settings.repository)
             try:
                 result = orchestrator.execute(envelope)
-            except WorkflowAgentServiceError:
+            except WorkflowAgentServiceError as error:
                 span.add_event(
                     "workflow.failed",
                     attributes={
@@ -64,9 +68,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         "error": True,
                     },
                 )
-                raise HTTPException(
-                    status_code=502, detail="Workflow backend request failed"
-                ) from None
+                _raise_workflow_backend_failure(error)
             span.add_event(
                 "workflow.completed",
                 attributes={
