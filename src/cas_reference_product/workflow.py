@@ -56,8 +56,8 @@ class FoundryWorkflowAgentService:
                         }
                     },
                 )
-            except Exception as error:
-                raise WorkflowAgentServiceError("Foundry workflow invocation failed") from error
+            except Exception:
+                raise WorkflowAgentServiceError("Foundry workflow invocation failed") from None
         return response.output_text
 
 

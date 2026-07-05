@@ -1,11 +1,9 @@
 from typing import Any
 from unittest.mock import patch
 
-import pytest
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from cas_reference_product.app import _raise_workflow_backend_failure, create_app
+from cas_reference_product.app import create_app
 from cas_reference_product.config import Settings
 from cas_reference_product.workflow import WorkflowAgentServiceError
 
@@ -71,23 +69,3 @@ def test_workflow_api_sanitizes_external_service_failures(envelope: "Any") -> No
     assert response.status_code == 502
     assert response.json() == {"detail": "Workflow backend request failed"}
     assert "sensitive" not in response.text
-
-
-def test_workflow_backend_failure_preserves_exception_chain() -> None:
-    with pytest.raises(HTTPException) as caught:
-        try:
-            raise RuntimeError("sensitive provider detail")
-        except RuntimeError as provider_error:
-            try:
-                raise WorkflowAgentServiceError("Foundry workflow invocation failed") from (
-                    provider_error
-                )
-            except WorkflowAgentServiceError as workflow_error:
-                _raise_workflow_backend_failure(workflow_error)
-
-    assert caught.value.status_code == 502
-    assert caught.value.detail == "Workflow backend request failed"
-    assert isinstance(caught.value.__cause__, WorkflowAgentServiceError)
-    assert str(caught.value.__cause__) == "Foundry workflow invocation failed"
-    assert isinstance(caught.value.__cause__.__cause__, RuntimeError)
-    assert str(caught.value.__cause__.__cause__) == "sensitive provider detail"

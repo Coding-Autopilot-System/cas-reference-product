@@ -93,5 +93,4 @@ def test_foundry_service_sanitizes_sdk_failure(envelope: "Any") -> None:
         ) as caught:
             service.run(envelope)
 
-    assert isinstance(caught.value.__cause__, RuntimeError)
-    assert str(caught.value.__cause__) == "sensitive provider detail"
+    assert caught.value.__cause__ is None
