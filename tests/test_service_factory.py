@@ -88,5 +88,9 @@ def test_foundry_service_sanitizes_sdk_failure(envelope: "Any") -> None:
         )
         service = FoundryWorkflowAgentService(settings)
 
-        with pytest.raises(WorkflowAgentServiceError, match="Foundry workflow invocation failed"):
+        with pytest.raises(
+            WorkflowAgentServiceError, match="Foundry workflow invocation failed"
+        ) as caught:
             service.run(envelope)
+
+    assert caught.value.__cause__ is None
