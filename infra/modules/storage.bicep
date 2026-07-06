@@ -27,6 +27,16 @@ resource workQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@2023-
   name: 'cas-work-items'
 }
 
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: account
+  name: 'default'
+}
+
+resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'app-package'
+}
+
 output id string = account.id
 output name string = account.name
 output queueName string = workQueue.name
