@@ -18,6 +18,12 @@ It runs a useful deterministic workflow locally, emits canonical [`cas-contracts
 
 This project does not use Classic Assistants APIs and does not deploy Azure resources.
 
+Azure deployment is locked workspace-wide until a future milestone (the CAS workspace's
+NO-AZURE-deploy hard lock). `cas-platform`, the deployment target this project's interface is
+designed for, is maintained "bicep-ready" (linted, parameterized, pinned) per Phase 33 but is not
+itself deployed. This repository's Foundry Next Gen adapter is exercised only through local runs
+and CI's Docker health-check smoke test — never a live Azure deploy.
+
 ## Run Locally
 
 Prerequisites: Python 3.12 and PowerShell.
@@ -72,3 +78,9 @@ The image runs as a non-root user, listens on port `8080`, and provides `/health
 ## Security
 
 Report vulnerabilities through GitHub private vulnerability reporting. Do not include credentials or sensitive prompt data in issues.
+
+## Wiki
+
+For a docs-as-code wiki (Home, Architecture, Operations, Decisions), see [`docs/wiki/`](docs/wiki/Home.md).
+
+<!-- docs-verified: 57c21b03a48332728105b72a90e8e89deda409af 2026-07-08 -->
