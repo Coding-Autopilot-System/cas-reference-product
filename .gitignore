@@ -13,3 +13,9 @@ build/
 # Claude Code session worktrees — never commit these
 .claude/worktrees/
 
+
+.tmp-gh-*.ps1
+
+.tmp-venv*/
+
+TestResults/
