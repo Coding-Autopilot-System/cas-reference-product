@@ -1,5 +1,7 @@
 # Architecture
 
+![Architecture Diagram](assets/arch.png)
+
 `cas-reference-product` implements a strictly typed request/response boundary using canonical
 `cas-contracts` data structures, with interchangeable local and Foundry Next Gen agent adapters
 behind the same `WorkflowAgentService` interface.
