@@ -6,6 +6,8 @@ The CAS Reference Product implements a robust boundary for the Coding Autopilot 
 
 The following diagram visualizes the primary request flow and components within the application:
 
+![Visual Diagram](assets/cas_reference_product_architecture.png)
+
 ```mermaid
 flowchart TD
     Client[Client] -->|POST /api/v1/workflows\nPromptEnvelope| FastAPI[FastAPI Server\napp.py]
